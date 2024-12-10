@@ -1,0 +1,74 @@
+// Define pins for ultrasonic sensor
+const int trigPin = 2;
+const int echoPin = 3;
+
+// Define pins for gas sensor
+const int gasSensorPin = A0;
+
+// Define pins for PIR sensor
+const int pirSensorPin = 4;
+
+// Define pins for soil moisture sensor
+const int soilMoisturePin = A1;
+
+// Variables for storing sensor values
+long duration;
+int distance;
+int gasSensorValue;
+int pirState = LOW; // Default state of PIR
+int soilMoistureValue;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+
+  // Initialize ultrasonic sensor pins
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  // Initialize PIR sensor pin
+  pinMode(pirSensorPin, INPUT);
+
+  // Initialize gas sensor pin (Analog input)
+  pinMode(gasSensorPin, INPUT);
+
+  // Initialize soil moisture sensor pin (Analog input)
+  pinMode(soilMoisturePin, INPUT);
+}
+
+void loop() {
+  // Read ultrasonic sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Read gas sensor
+  gasSensorValue = analogRead(gasSensorPin);
+  Serial.print("Gas Sensor Value: ");
+  Serial.println(gasSensorValue);
+
+  // Read PIR sensor
+  int pirReading = digitalRead(pirSensorPin);
+  if (pirReading == HIGH && pirState == LOW) {
+    Serial.println("Motion Detected!");
+    pirState = HIGH;
+  } else if (pirReading == LOW && pirState == HIGH) {
+    Serial.println("No Motion");
+    pirState = LOW;
+  }
+
+  // Read soil moisture sensor
+  soilMoistureValue = analogRead(soilMoisturePin);
+  Serial.print("Soil Moisture Value: ");
+  Serial.println(soilMoistureValue);
+
+  // Delay between sensor readings
+  delay(1000);
+}
